@@ -1,0 +1,44 @@
+name: Deploy Lambda Function
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: "3.12"
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install pandas python-dateutil -t .
+
+      - name: Package Lambda function
+        run: |
+          zip -r my_lambda_function.zip .
+
+      - name: Install AWS CLI
+        run: |
+          pip install awscli
+
+      - name: Deploy Lambda function
+        run: |
+          aws lambda update-function-code --function-name splitCsv --zip-file fileb://my_lambda_function.zip --region ap-south-1
+        env:
+          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          AWS_REGION: "ap-south-1"
+
+      - name: Clean up
+        run: |
+          rm my_lambda_function.zip
