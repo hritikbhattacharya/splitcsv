@@ -58,7 +58,7 @@ def lambda_handler(event, context):
         bucket_name = event['bucket_name']
         file_key = event['file_key']
         dob_cutoff = event['dob_cutoff']
-        output_bucket = event.get('output_bucket', bucket_name)  # Default to the same bucket if not provided
+        output_bucket = event.get('output_bucket', bucket_name)  
 
         # Split the CSV file
         split_csv(bucket_name, file_key, dob_cutoff, output_bucket)
